@@ -1,0 +1,59 @@
+@startuml container_diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+
+    !$COLOR_USER = "#64A0E6"
+   AddPersonTag("employee", $bgColor="#1B5DAA", $fontColor="white", $borderColor="#FF6347", $legendText="Сотрудники")
+   AddContainerTag("kafka", $bgColor="#64A0E6", $fontColor="white", $legendText="Сервисы для клиентов")
+   AddContainerTag("auth", $bgColor="#7B92BE", $fontColor="white", $legendText="Регистрация/Авторизация")
+   AddContainerTag("data", $bgColor="#A28AA6", $fontColor="white", $legendText="")
+   AddContainerTag("external_system", $bgColor="#91A1B3", $fontColor="white", $legendText="")
+   UpdateElementStyle("external_person", $bgColor=$COLOR_USER)
+   
+
+ 
+ System_Boundary(future, "Будущее 2.0" ) {
+  Container(keycloak, "Keycloak", "IAM", "Аутентификация и авторизация пользователей, выдача токенов")
+   Person(employees, "Бизнес-пользователь.Сотрудник головного офиса, клиники, финтех-отдела", $tags="employee")
+   Person(operator, "Оператор клиники")
+   Container(frontend, "Портал самообслуживания (Витрина данных)", "Веб-приложение, React")
+   Container(api_gateway, "API Gateway", "Nginx")
+   Container(backend, "Сервис отчетов", "Бэкенд для портала, Python")
+   System(cloud_dwh, "Облачное DWH", $tags='data', "Cтруктурированные и агрегированные данные для быстрой аналитики")
+   System(data_lake, "Озеро данных", $tags='data', "S3, Хранилище для всех сырых данных компании из разных доменов")
+   System(transform, "Сервис трансформации данных (ETL/ELT)","Apache Airflow, Забирает сырые данные из Озера, очищает, обогащает, агрегирует и загружает в Облачное DWH.")
+   ContainerQueue(kafka, "Шина событий Apache Kafka",$tags="kafka", "Доменные системы публикуют в нее события о бизнес-операциях")
+
+    
+   System(fin_domen, "Финтех", $tags="external_system", "Независимые сервисы для работы с кредитами, счетами и т.д.")
+   System(ai_domen, "ИИ-сервисы", $tags="external_system", "Сервисы для анализа медицинских данных (не для BI-аналитики)")
+  
+
+ System_Boundary(legacy, "Легаси-ландшафт") {
+    Container(legacy_dwh, "Корпоративный DWH", "SQL Server 2008", "Исторические витрины и отчёты из предыдущей системы")
+    Container(legacy_bi, "Legacy BI", "Power BI / PowerBuilder", "Существующие отчёты и интерфейсы операторов")
+     Container(legacy_adapter, "Адаптер для Legacy")
+  }
+
+ }
+ 
+Rel(employees, frontend, "Работает с витриной данных, смотрит и составляет отчеты", "HTTPS/SSO")
+Rel(operator, legacy_bi, "Продолжает использовать старую систему для ввода и просмотра операционных данных")
+Rel(frontend, api_gateway, "Все запросы от фронтенда идут через единую точку входа", "HTTPS")
+Rel(api_gateway, keycloak, "Проверяет токен пользователя", "OAuth2/OIDC")
+Rel(api_gateway, backend, "Перенаправляет валидный запрос на исполнение в бэкенд-сервис.", "REST")
+Rel(backend, cloud_dwh, "Выполняет запрос к  хранилищу, где лежат подготовленные данные", " SQL")
+Rel(fin_domen, kafka, "Публикует бизнес-события (например, создан счет, выдан кредит).", "Kafka-продюсер")
+Rel(ai_domen, kafka, "Публикует результаты своей работы (например, обезличенная статистика по диагнозам).", "Kafka-продюсер")
+Rel(legacy_dwh, legacy_adapter, "Старая база данных отдает свои изменения специальному сервису-адаптеру.")
+Rel(legacy_adapter, kafka, " Адаптер преобразует данные из старой базы в события и публикует их в Kafka.", "Kafka-продюсер")
+
+Rel(kafka, data_lake,  "Все события из шины сохраняются в сыром виде в облачном хранилище (S3) для истории и последующей обработки.")
+Rel(transform, data_lake,  "Забирает сырые данные для их очистки, обогащения и агрегации.")
+
+Rel(transform, cloud_dwh,  "Загружает обработанные, чистые данные в аналитическое хранилище, делая их доступными для сервиса отчетов.")
+
+Rel(ai_domen, legacy_dwh, " ИИ-сервисы могут напрямую читать необходимые им медицинские данные из старой базы (пока она не выведена из эксплуатации). Эта связь — временная", "SQL")
+
+ 
+@enduml
