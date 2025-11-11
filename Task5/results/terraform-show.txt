@@ -1,0 +1,335 @@
+PS D:\project\architecture-future_2_0\Task5> terraform show
+# data.yandex_compute_image.ubuntu:
+data "yandex_compute_image" "ubuntu" {
+    created_at          = "2025-11-10T11:09:21Z"
+    description         = "Ubuntu 20.04 lts v20251031011229"
+    family              = "ubuntu-2004-lts"
+    folder_id           = "standard-images"
+    hardware_generation = [
+        {
+            generation2_features = []
+            legacy_features      = [
+                {
+                    pci_topology = "PCI_TOPOLOGY_V2"
+                },
+            ]
+        },
+    ]
+    id                  = "fd8nvsua0sq94uqoep04"
+    image_id            = "fd8nvsua0sq94uqoep04"
+    labels              = {
+        "version" = "20251031011229"
+    }
+    min_disk_size       = 5
+    name                = "ubuntu-20-04-lts-v20251110"
+    os_type             = "linux"
+    pooled              = true
+    product_ids         = [
+        "f2el3v9lr1vdaid9okle",
+    ]
+    size                = 2
+    status              = "ready"
+}
+
+# random_id.bucket_suffix:
+resource "random_id" "bucket_suffix" {
+    b64_std     = "jdFAvQ=="
+    b64_url     = "jdFAvQ"
+    byte_length = 4
+    dec         = "2379301053"
+    hex         = "8dd140bd"
+    id          = "jdFAvQ"
+}
+
+# yandex_compute_disk.data:
+resource "yandex_compute_disk" "data" {
+    block_size  = 4096
+    created_at  = "2025-11-11T15:25:31Z"
+    description = null
+    folder_id   = "b1gqb38j0cs3h0cup9am"
+    id          = "fhmr5ru8kuoplapq01gs"
+    image_id    = null
+    labels      = {}
+    name        = "future20-data-disk"
+    product_ids = []
+    size        = 20
+    snapshot_id = null
+    status      = "ready"
+    type        = "network-hdd"
+    zone        = "ru-central1-a"
+
+    disk_placement_policy {
+        disk_placement_group_id = null
+    }
+
+    hardware_generation {
+        legacy_features {
+            pci_topology = "PCI_TOPOLOGY_V1"
+        }
+    }
+}
+
+# yandex_compute_instance.vm:
+resource "yandex_compute_instance" "vm" {
+    created_at                = "2025-11-11T15:25:39Z"
+    description               = null
+    folder_id                 = "b1gqb38j0cs3h0cup9am"
+    fqdn                      = "fhm4ntaa7vs7efihi35h.auto.internal"
+    gpu_cluster_id            = null
+    hardware_generation       = [
+        {
+            generation2_features = []
+            legacy_features      = [
+                {
+                    pci_topology = "PCI_TOPOLOGY_V2"
+                },
+            ]
+        },
+    ]
+    hostname                  = null
+    id                        = "fhm4ntaa7vs7efihi35h"
+    labels                    = {}
+    maintenance_grace_period  = null
+    metadata                  = {
+        "ssh-keys" = "ubuntu:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDKG637uQv9CF+lU5U+FfToLFP0kTjFmPLEs/ml1N4s3n2ed+sPWzVZEvSjm10Bgpz7iALirp/S1NoaCQcB9oGj
+cRppSGVM2RhYfqY/elux4+kTqpChB26Tb267XnYYjLGIKyd4tcMnuQdrfLWjNWfyyzv6JekylFdLJShRxgS6vF2bslm60DXn8nPk8QSDgA2FIHMGWr98PyNeunQEOJPf8dSmyFg32oo27SBonuhiaIDRSvSOMMx3AcXNkCut0ZfCzpN+Irv1lrOiIkzo8hkouhcwXCYfJbdM/i9nVGREsH9vB6bcCDkWK3K+l5PIVLZIvUkKg5XC8XJ1W+pvGy2f"                                                     }
+    name                      = "future20-vm"
+    network_acceleration_type = "standard"
+    platform_id               = "standard-v3"
+    service_account_id        = null
+    status                    = "running"
+    zone                      = "ru-central1-a"
+
+    boot_disk {
+        auto_delete = true
+        device_name = "fhm1v24d1haen71vjbos"
+        disk_id     = "fhm1v24d1haen71vjbos"
+        mode        = "READ_WRITE"
+
+        initialize_params {
+            block_size  = 4096
+            description = null
+            image_id    = "fd8nvsua0sq94uqoep04"
+            kms_key_id  = null
+            name        = null
+            size        = 15
+            snapshot_id = null
+            type        = "network-hdd"
+        }
+    }
+
+    metadata_options {
+        aws_v1_http_endpoint = 1
+        aws_v1_http_token    = 2
+        gce_http_endpoint    = 1
+        gce_http_token       = 1
+    }
+
+    network_interface {
+        index              = 0
+        ip_address         = "10.25.1.10"
+        ipv4               = true
+        ipv6               = false
+        ipv6_address       = null
+        mac_address        = "d0:0d:4b:f5:4a:3f"
+        nat                = true
+        nat_ip_address     = "62.84.116.198"
+        nat_ip_version     = "IPV4"
+        security_group_ids = [
+            "enps52nar5ji17dc90ln",
+        ]
+        subnet_id          = "e9bonhooq6h6ofmddncp"
+    }
+
+    placement_policy {
+        host_affinity_rules       = []
+        placement_group_id        = null
+        placement_group_partition = 0
+    }
+
+    resources {
+        core_fraction = 100
+        cores         = 2
+        gpus          = 0
+        memory        = 2
+    }
+
+    scheduling_policy {
+        preemptible = false
+    }
+
+    secondary_disk {
+        auto_delete = false
+        device_name = "fhmr5ru8kuoplapq01gs"
+        disk_id     = "fhmr5ru8kuoplapq01gs"
+        mode        = "READ_WRITE"
+    }
+}
+
+# yandex_storage_bucket.raw:
+resource "yandex_storage_bucket" "raw" {
+    access_key            = "YCAJE8WFsYIqT5g9DN77gqEhx"
+    bucket                = "future20-raw-8dd140bd"
+    bucket_domain_name    = "future20-raw-8dd140bd.storage.yandexcloud.net"
+    default_storage_class = "STANDARD"
+    folder_id             = "b1gqb38j0cs3h0cup9am"
+    force_destroy         = false
+    id                    = "future20-raw-8dd140bd"
+    max_size              = 0
+    policy                = null
+    secret_key            = (sensitive value)
+
+    anonymous_access_flags {
+        config_read = false
+        list        = false
+        read        = false
+    }
+
+    versioning {
+        enabled = false
+    }
+}
+
+# yandex_vpc_gateway.egress:
+resource "yandex_vpc_gateway" "egress" {
+    created_at  = "2025-11-11T15:25:31Z"
+    description = null
+    folder_id   = "b1gqb38j0cs3h0cup9am"
+    id          = "enpkq1vufjqh8j4qst9i"
+    labels      = {}
+    name        = "future20-egress"
+
+    shared_egress_gateway {}
+}
+
+# yandex_vpc_network.this:
+resource "yandex_vpc_network" "this" {
+    created_at                = "2025-11-11T15:25:31Z"
+    default_security_group_id = "enpu6bfah29j8ojd27be"
+    description               = null
+    folder_id                 = "b1gqb38j0cs3h0cup9am"
+    id                        = "enpcfgrp2abbh8k7r10c"
+    labels                    = {}
+    name                      = "future20-net"
+    subnet_ids                = [
+        "e9bonhooq6h6ofmddncp",
+        "e9budd8umdj9ed0tl5n7",
+    ]
+}
+
+# yandex_vpc_route_table.private:
+resource "yandex_vpc_route_table" "private" {
+    created_at  = "2025-11-11T15:25:34Z"
+    description = null
+    folder_id   = "b1gqb38j0cs3h0cup9am"
+    id          = "enpfqcp3fmku57u7trim"
+    labels      = {}
+    name        = null
+    network_id  = "enpcfgrp2abbh8k7r10c"
+
+    static_route {
+        destination_prefix = "0.0.0.0/0"
+        gateway_id         = "enpkq1vufjqh8j4qst9i"
+        next_hop_address   = null
+    }
+}
+
+# yandex_vpc_security_group.vm_sg:
+resource "yandex_vpc_security_group" "vm_sg" {
+    created_at  = "2025-11-11T15:25:35Z"
+    description = null
+    folder_id   = "b1gqb38j0cs3h0cup9am"
+    id          = "enps52nar5ji17dc90ln"
+    labels      = {}
+    name        = "future20-sg"
+    network_id  = "enpcfgrp2abbh8k7r10c"
+    status      = "ACTIVE"
+
+    egress {
+        description       = "Any"
+        from_port         = 0
+        id                = "enphn4ip4de97d8u3lku"
+        labels            = {}
+        port              = -1
+        predefined_target = null
+        protocol          = "ANY"
+        security_group_id = null
+        to_port           = 65535
+        v4_cidr_blocks    = [
+            "0.0.0.0/0",
+        ]
+        v6_cidr_blocks    = []
+    }
+
+    ingress {
+        description       = "HTTP"
+        from_port         = -1
+        id                = "enpia3sn8t44cq8d3rve"
+        labels            = {}
+        port              = 80
+        predefined_target = null
+        protocol          = "TCP"
+        security_group_id = null
+        to_port           = -1
+        v4_cidr_blocks    = [
+            "0.0.0.0/0",
+        ]
+        v6_cidr_blocks    = []
+    }
+    ingress {
+        description       = "SSH"
+        from_port         = -1
+        id                = "enpvovsqu3639dflfm1l"
+        labels            = {}
+        port              = 22
+        predefined_target = null
+        protocol          = "TCP"
+        security_group_id = null
+        to_port           = -1
+        v4_cidr_blocks    = [
+            "0.0.0.0/0",
+        ]
+        v6_cidr_blocks    = []
+    }
+}
+
+# yandex_vpc_subnet.private:
+resource "yandex_vpc_subnet" "private" {
+    created_at     = "2025-11-11T15:25:35Z"
+    description    = null
+    folder_id      = "b1gqb38j0cs3h0cup9am"
+    id             = "e9budd8umdj9ed0tl5n7"
+    labels         = {}
+    name           = "future20-subnet-private"
+    network_id     = "enpcfgrp2abbh8k7r10c"
+    route_table_id = "enpfqcp3fmku57u7trim"
+    v4_cidr_blocks = [
+        "10.25.2.0/24",
+    ]
+    v6_cidr_blocks = []
+    zone           = "ru-central1-a"
+}
+
+# yandex_vpc_subnet.public:
+resource "yandex_vpc_subnet" "public" {
+    created_at     = "2025-11-11T15:25:33Z"
+    description    = null
+    folder_id      = "b1gqb38j0cs3h0cup9am"
+    id             = "e9bonhooq6h6ofmddncp"
+    labels         = {}
+    name           = "future20-subnet-public"
+    network_id     = "enpcfgrp2abbh8k7r10c"
+    route_table_id = null
+    v4_cidr_blocks = [
+        "10.25.1.0/24",
+    ]
+    v6_cidr_blocks = []
+    zone           = "ru-central1-a"
+}
+
+
+Outputs:
+
+bucket_name = "future20-raw-8dd140bd"
+network_id = "enpcfgrp2abbh8k7r10c"
+vm_public_ip = "62.84.116.198"
